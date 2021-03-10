@@ -1,0 +1,13 @@
+﻿
+<section class="spectator-message__wrapper">
+    <h3>
+        @Message
+    </h3>
+</section>
+
+@code {
+    [Parameter]
+    public IEnumerable<GameLog> Logs { get; set; }
+
+    private string Message => Logs?.LastOrDefault()?.Message;
+}

@@ -1,0 +1,51 @@
+﻿
+<main class="board__wrapper">
+    @for (int i = 0; i < 9; i++)
+    {
+        var index = i;
+        <button class=@cssField(i) disabled="@isDisabled(i)" @onclick="() => FieldClick(index)">@fieldValue(i)</button>
+    }
+</main>
+
+@code {
+    [Parameter]
+    public EnumPlayerType? PlayerType { get; set; }
+    [Parameter]
+    public bool IsActive { get; set; }
+    [Parameter]
+    public IEnumerable<string> Fields { get; set; }
+    [Parameter]
+    public EventCallback<int> OnFieldClick { get; set; }
+    [Parameter]
+    public GameResult GameResult { get; set; }
+
+    private string fieldValue(int field) => Fields.ElementAt(field);
+
+    private bool isDisabled(int field) => IsActive && isPlayer ? !string.IsNullOrEmpty(fieldValue(field)) : true;
+
+    private bool isPlayer => PlayerType.HasValue;
+
+    private string cssField(int field) => isDisabled(field)
+        ? $"board__field {cssDisabledField(field)}"
+        : $"board__field {cssPlayerField}";
+
+    private string cssPlayerField => PlayerType.HasValue ? $"board__field--{PlayerType.Value.ToString().ToLower()}" : "";
+
+    private string cssDisabledField(int field)
+    {
+        string css;
+
+        css = GameResult.Result == EnumGameResult.None ? "board__field--disabled" : "board__field--game-over";
+
+        if (GameResult.Result == EnumGameResult.WinX || GameResult.Result == EnumGameResult.WinO)
+        {
+            if (GameLogic.GetWinFields(GameResult.WinType).Contains(field))
+                css += " board__field--win";
+        }
+        return css;
+    }
+
+
+    private void FieldClick(int index) => OnFieldClick.InvokeAsync(index);
+
+}

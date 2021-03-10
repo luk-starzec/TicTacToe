@@ -1,0 +1,42 @@
+﻿@inject NavigationManager NavigationManager
+
+<div class="game-container__wrapper">
+
+    <GameHeader Player="@player" Opponent="@opponent" FirstPlayer="@firstPlayer" />
+
+    @if (isPlayer)
+    {
+        <PlayerMessage Player="@player" Result="@gameResult.Result" />
+    }
+    else
+    {
+        <SpectatorMessage Logs="@logs" />
+    }
+
+    <Board Fields="@fields" PlayerType="@(isPlayer ? player.PlayerType : null)" IsActive="@isActive" GameResult="@gameResult" OnFieldClick="@OnFieldClick" />
+
+    @if (gameResult.Result != EnumGameResult.None && isPlayer)
+    {
+        <button class="game-container__new-game" @onclick="()=>OnNewGame()">START NEW GAME</button>
+    }
+
+</div>
+
+@code {
+    [Parameter]
+    public GameManager GameManager { get; set; }
+
+    private Player player => GameManager?.Player;
+    private bool isPlayer => GameManager.IsPlayer;
+    private bool isActive => player?.IsActive ?? false;
+    private Player opponent => GameManager?.Opponent;
+    private EnumPlayerType firstPlayer => GameManager.FirstPlayer;
+
+    private IEnumerable<string> fields => GameManager.Fields;
+    private GameResult gameResult => GameManager.GameResult;
+    private IEnumerable<GameLog> logs => GameManager.Logs;
+
+    private async Task OnFieldClick(int field) => await GameManager.Play(field);
+    private void OnNewGame() => NavigationManager.NavigateTo("");
+
+}

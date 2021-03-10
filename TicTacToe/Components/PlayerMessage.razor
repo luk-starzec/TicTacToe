@@ -1,0 +1,51 @@
+﻿
+<section class="player-message__wrapper">
+    @if (isGameOver)
+    {
+        <h3 class="player-message__game-over">
+            GAME OVER
+        </h3>
+    }
+    <p class="@cssMessage">
+        @GetMessage()
+    </p>
+</section>
+
+@code {
+    [Parameter]
+    public Player Player { get; set; }
+    [Parameter]
+    public EnumGameResult Result { get; set; }
+
+    private bool isActive => Player.IsActive;
+    private bool isGameOver => Result != EnumGameResult.None;
+
+    private string GetMessage()
+    {
+        switch (Result)
+        {
+            case EnumGameResult.None:
+                return isActive ? "Your move!" : "Opponent's turn";
+            case EnumGameResult.Tie:
+                return "It’s a tie";
+            case EnumGameResult.WinX:
+                return Player.PlayerType == EnumPlayerType.X ? winMessage : loseMessage;
+            case EnumGameResult.WinO:
+                return Player.PlayerType == EnumPlayerType.O ? winMessage : loseMessage;
+            case EnumGameResult.TimeOutX:
+                return Player.PlayerType == EnumPlayerType.X ? timeOutLoseMessage : winMessage;
+            case EnumGameResult.TimeOutO:
+                return Player.PlayerType == EnumPlayerType.O ? timeOutLoseMessage : winMessage;
+            default:
+                return string.Empty;
+        }
+    }
+
+    private string winMessage = "You won!";
+    private string loseMessage = "maybe next time...";
+    private string timeOutLoseMessage = "timeout...";
+
+    private string cssMessage => isGameOver
+            ? "player-message__text player-message__text--game-over"
+            : (isActive ? "player-message__text player-message__text--active" : "player-message__text");
+}

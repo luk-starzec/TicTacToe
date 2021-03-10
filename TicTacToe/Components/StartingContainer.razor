@@ -1,0 +1,63 @@
+﻿@using System.Timers;
+
+<div class="starting-container__wrapper">
+
+    <section class="@cssMessage">
+        @messages[messageIndex]
+    </section>
+
+</div>
+
+@code {
+    [Parameter]
+    public EventCallback OnCountdownEnd { get; set; }
+
+    private string[] messages =
+    {
+        "3",
+        "2",
+        "1",
+        "Fight!",
+    };
+
+    private bool showAnimation = true;
+
+    private string cssMessage => showAnimation ? "starting-container__message starting-container__message--animation" : "starting-container__message";
+
+    private int messageIndex = 0;
+    private Timer timer = new Timer();
+    private Timer animationTimer = new Timer();
+
+    protected override void OnInitialized()
+    {
+        timer.Interval = 1000;
+        timer.Elapsed += OnTimerTick;
+
+        animationTimer.Interval = 300;
+        animationTimer.Elapsed += OnAnimationTimerTick;
+
+        timer.Start();
+        animationTimer.Start();
+    }
+
+    private void OnTimerTick(object sender, ElapsedEventArgs e)
+    {
+        if (messageIndex < messages.Length - 1)
+        {
+            showAnimation = true;
+            messageIndex++;
+            InvokeAsync(() => StateHasChanged());
+        }
+        else
+        {
+            timer.Stop();
+            InvokeAsync(() => OnCountdownEnd.InvokeAsync());
+        }
+    }
+
+    private void OnAnimationTimerTick(object sender, ElapsedEventArgs e)
+    {
+        showAnimation = false;
+        InvokeAsync(() => StateHasChanged());
+    }
+}

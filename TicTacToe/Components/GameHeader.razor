@@ -1,0 +1,38 @@
+﻿
+<header class="game-header__wrapper">
+
+    <label class="game-header__player-label">@leftPlayer?.PlayerName</label>
+
+    <div class="game-header__player-bar game-header__player-bar--left">
+        <div class="game-header__player-time game-header__player-time--left" style="@styleLeft"></div>
+    </div>
+
+    <div class="game-header__middle-label">KO</div>
+
+    <div class="game-header__player-bar game-header__player-bar--right">
+        <div class="game-header__player-time game-header__player-time--right" style="@styleRight"></div>
+    </div>
+
+    <label class="game-header__player-label game-header__player-label--right">@rightPlayer?.PlayerName</label>
+
+</header>
+
+@code {
+    [Parameter]
+    public Player Player { get; set; }
+    [Parameter]
+    public Player Opponent { get; set; }
+    [Parameter]
+    public EnumPlayerType FirstPlayer { get; set; }
+
+    private Player leftPlayer => Player?.PlayerType == FirstPlayer ? Player : Opponent;
+    private Player rightPlayer => Player?.PlayerType == FirstPlayer ? Opponent : Player;
+
+    private decimal leftTime => leftPlayer?.TimePercentLeft ?? 1;
+    private decimal rightTime => rightPlayer?.TimePercentLeft ?? 1;
+
+    private string styleLeft => getTimeStyle(leftTime);
+    private string styleRight => getTimeStyle(rightTime);
+
+    private string getTimeStyle(decimal time) => $"--time-percent: { time.ToString().Replace(",", ".")}";
+}

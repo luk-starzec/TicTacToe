@@ -1,0 +1,80 @@
+﻿@inject NavigationManager NavigationManager
+@inject IJSRuntime JSRuntime
+
+<div class="preparing-container__wrapper">
+
+    <div class=@cssCopiedInfo>
+        Link copied
+    </div>
+
+    <header class="preparing-container__header">
+        Waiting for second player...
+    </header>
+
+    @if (Options.OpponentId != Guid.Empty)
+    {
+        <section class="preparing-container__section">
+            <label class="preparing-container__label">
+                Invite <span class="preparing-container__label--player">Player @Options.OpponentName</span>
+            </label>
+            <div class="preparing-container__link">
+                @LinkForOponent
+                <button type="button" class="preparing-container__copy-button" @onclick="()=>CopyTextToClipboard(LinkForOponent)">Copy</button>
+            </div>
+        </section>
+    }
+
+    <section class="preparing-container__section preparing-container__section--spectator">
+        <label class="preparing-container__label">
+            Invite spectators
+        </label>
+        <div class="preparing-container__link">
+            @LinkForSpectator
+            <button type="button" class="preparing-container__copy-button" @onclick="()=>CopyTextToClipboard(LinkForSpectator)">Copy</button>
+        </div>
+    </section>
+
+</div>
+
+@code {
+    [Parameter]
+    public GamePreparation Options { get; set; }
+
+    private string LinkForSpectator => NavigationManager.ToAbsoluteUri(GameLogic.GetGameUrl(Options.GameId)).ToString();
+    private string LinkForOponent => NavigationManager.ToAbsoluteUri(GameLogic.GetGameUrl(Options.GameId, Options.OpponentId)).ToString();
+
+    private bool visibleCopiedInfo;
+    private string cssCopiedInfo => visibleCopiedInfo ? "preparing-container__copied preparing-container__copied--visible" : "preparing-container__copied";
+
+    private async Task CopyTextToClipboard(string text)
+    {
+        var result = await JSRuntime.InvokeAsync<bool>("clipboardCopy.copyText", text);
+        if (result)
+            ShowCopiedInfo();
+    }
+
+    private void ShowCopiedInfo()
+    {
+        visibleCopiedInfo = true;
+
+        var timer = new System.Timers.Timer()
+        {
+            Interval = 2000,
+            AutoReset = false,
+            Enabled = true,
+        };
+        timer.Elapsed += OnTimedEvent;
+    }
+
+    private void HideCopiedInfo()
+    {
+        visibleCopiedInfo = false;
+        InvokeAsync(StateHasChanged);
+    }
+
+    private void OnTimedEvent(Object source, System.Timers.ElapsedEventArgs e)
+    {
+        HideCopiedInfo();
+    }
+
+}

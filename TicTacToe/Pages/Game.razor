@@ -1,0 +1,70 @@
+﻿@page "/game/{GameId:guid}"
+@page "/game/{GameId:guid}/{PlayerId:guid?}"
+@using Microsoft.AspNetCore.WebUtilities
+@inject NavigationManager NavigationManager
+
+<div class="game__wrapper">
+
+    @if (gameManager?.GameStage == EnumGameStage.Preparing)
+    {
+        <PreparingContainer Options="@gameManager?.GamePreparation" />
+    }
+    else if (gameManager?.GameStage == EnumGameStage.Starting)
+    {
+        <StartingContainer OnCountdownEnd="StartGame" />
+    }
+    else if (gameManager?.GameStage == EnumGameStage.Started)
+    {
+        <GameContainer GameManager="@gameManager" />
+    }
+
+</div>
+
+
+
+@code {
+    [Parameter]
+    public Guid GameId { get; set; }
+    [Parameter]
+    public Guid? PlayerId { get; set; }
+
+    private GameManager gameManager;
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        var hubUrl = NavigationManager.ToAbsoluteUri(GameHub.HubUrl).ToString();
+        gameManager = new GameManager(hubUrl, GameId);
+        gameManager.PropertyChanged += (o, e) => StateHasChanged();
+
+        await gameManager.StartConnection();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            gameManager.Player = PlayerId is not null ? new Player(PlayerId.Value) : null;
+            await InitGame();
+            await gameManager.JoinGame();
+        }
+    }
+
+    private async Task InitGame()
+    {
+        var queryString = new Uri(NavigationManager.Uri).Query;
+
+        if (QueryHelpers.ParseQuery(queryString).TryGetValue("init", out var pt))
+        {
+            var playerType = Enum.Parse(typeof(EnumPlayerType), pt.ToString().ToUpper()) as EnumPlayerType?;
+            if (playerType.HasValue)
+            {
+                gameManager.Player.PlayerType = playerType.Value;
+                await gameManager.CreateGame();
+            }
+        }
+    }
+
+    private async Task StartGame() => await gameManager.StartGame();
+
+}

@@ -1,0 +1,23 @@
+﻿@page "/"
+@inject NavigationManager NavigationManager
+
+<div class="main__wrapper">
+    <header class="main__header">
+        <span class="big">X</span> s <span class="small">vs</span> <span class="big">O</span> s
+    </header>
+    <main class="main__options">
+        <h3>OPTIONS</h3>
+        <button class="main__option-button" @onclick="()=>StartGame(EnumPlayerType.X)">Play as X</button>
+        <button class="main__option-button" @onclick="()=>StartGame(EnumPlayerType.O)">Play as O</button>
+    </main>
+    <footer class="main__footer">
+        © 2020
+    </footer>
+</div>
+
+@code{
+    private void StartGame(EnumPlayerType playerType)
+    {
+        NavigationManager.NavigateTo(GameLogic.GetGameUrl(Guid.NewGuid(), Guid.NewGuid(), playerType));
+    }
+}
