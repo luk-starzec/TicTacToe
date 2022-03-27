@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using TicTacToe.Helpers;
 using TicTacToe.Models;
 
 namespace TicTacToe.Logic
@@ -18,9 +19,10 @@ namespace TicTacToe.Logic
 
         public static EnumPlayerType OponentType(EnumPlayerType playerType) => (EnumPlayerType)((int)playerType * (-1));
 
-        public static string GetGameUrl(Guid gameId) => $"/game/{gameId}";
-        public static string GetGameUrl(Guid gameId, Guid playerId) => $"/game/{gameId}/{playerId}";
-        public static string GetGameUrl(Guid gameId, Guid playerId, EnumPlayerType playerType) => $"/game/{gameId}/{playerId}?init={playerType}";
+        public static string GetGameUrl(Guid gameId) => $"/game/{GuidEncoder.Encode(gameId)}";
+        public static string GetGameUrl(Guid gameId, Guid playerId) => $"/game/{GuidEncoder.Encode(gameId)}/{GuidEncoder.Encode(playerId)}";
+        public static string GetGameUrl(Guid gameId, Guid playerId, EnumPlayerType playerType)
+            => $"/game/{GuidEncoder.Encode(gameId)}/{GuidEncoder.Encode(playerId)}?init={playerType}";
 
         public static GameState CreateGameState(Guid playerId, EnumPlayerType playerType, Guid oponentId)
         {

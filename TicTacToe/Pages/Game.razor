@@ -1,5 +1,5 @@
-﻿@page "/game/{GameId:guid}"
-@page "/game/{GameId:guid}/{PlayerId:guid?}"
+﻿@page "/game/{GameUId}"
+@page "/game/{GameUId}/{PlayerUId}"
 @using Microsoft.AspNetCore.WebUtilities
 @inject NavigationManager NavigationManager
 
@@ -24,9 +24,9 @@
 
 @code {
     [Parameter]
-    public Guid GameId { get; set; }
+    public string GameUId { get; set; }
     [Parameter]
-    public Guid? PlayerId { get; set; }
+    public string PlayerUId { get; set; }
 
     private GameManager gameManager;
 
@@ -34,7 +34,8 @@
     protected override async Task OnInitializedAsync()
     {
         var hubUrl = NavigationManager.ToAbsoluteUri(GameHub.HubUrl).ToString();
-        gameManager = new GameManager(hubUrl, GameId);
+        var gameId = GuidEncoder.Decode(GameUId);
+        gameManager = new GameManager(hubUrl, gameId);
         gameManager.PropertyChanged += (o, e) => StateHasChanged();
 
         await gameManager.StartConnection();
@@ -44,7 +45,8 @@
     {
         if (firstRender)
         {
-            gameManager.Player = PlayerId is not null ? new Player(PlayerId.Value) : null;
+            Guid? playerId = PlayerUId is not null ? GuidEncoder.Decode(PlayerUId) : null;
+            gameManager.Player = playerId is not null ? new Player(playerId.Value) : null;
             await InitGame();
             await gameManager.JoinGame();
         }
