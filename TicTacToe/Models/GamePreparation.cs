@@ -1,11 +1,8 @@
-﻿using System;
+﻿namespace TicTacToe.Models;
 
-namespace TicTacToe.Models
+public class GamePreparation
 {
-    public class GamePreparation
-    {
-        public Guid GameId { get; set; }
-        public string OpponentName { get; set; }
-        public Guid OpponentId { get; set; }
-    }
+    public string GameId { get; set; }
+    public string OpponentName { get; set; }
+    public string OpponentId { get; set; }
 }

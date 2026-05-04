@@ -1,9 +1,8 @@
-﻿namespace TicTacToe.Models
+﻿namespace TicTacToe.Models;
+
+public enum EnumWinDirection
 {
-    public enum EnumWinDirection
-    {
-        Row = 1,
-        Column = 2,
-        Diagonal = 3,
-    }
+    Row = 1,
+    Column = 2,
+    Diagonal = 3,
 }

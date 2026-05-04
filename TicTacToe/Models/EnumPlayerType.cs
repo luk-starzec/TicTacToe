@@ -1,8 +1,7 @@
-﻿namespace TicTacToe.Models
+﻿namespace TicTacToe.Models;
+
+public enum EnumPlayerType
 {
-    public enum EnumPlayerType
-    {
-        X = -1,
-        O = 1
-    }
+    X = -1,
+    O = 1
 }

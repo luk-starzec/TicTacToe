@@ -49,18 +49,18 @@ body {
     font-family: Wellbutrin;
 }
 
-body:before {
-    position: absolute;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    left: 0;
-    background: repeating-linear-gradient(#0D122B, #0D122B 2px, #565B73 2px, #565B73 4px);
-    opacity: 0.1;
-    z-index: 100;
-    content: "";
-    pointer-events: none;
-}
+    body:before {
+        position: absolute;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        background: repeating-linear-gradient(#0D122B, #0D122B 2px, #565B73 2px, #565B73 4px);
+        opacity: 0.1;
+        z-index: 100;
+        content: "";
+        pointer-events: none;
+    }
 
 #blazor-error-ui {
     background: lightyellow;
@@ -74,12 +74,12 @@ body:before {
     z-index: 1000;
 }
 
-#blazor-error-ui .dismiss {
-    cursor: pointer;
-    position: absolute;
-    right: 0.75rem;
-    top: 0.5rem;
-}
+    #blazor-error-ui .dismiss {
+        cursor: pointer;
+        position: absolute;
+        right: 0.75rem;
+        top: 0.5rem;
+    }
 
 .main__wrapper {
     background-color: #222222;
@@ -173,6 +173,17 @@ body:before {
 }
 
 
+@mixin full-screen-container {
+    width: 100vw;
+    height: 100vh;
+    display: grid;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    font-family: Wellbutrin;
+    overflow: hidden;
+}
+
 .game__wrapper {
     width: 100vw;
     height: 100vh;
@@ -180,19 +191,112 @@ body:before {
     background-size: cover;
 }
 
-.preparing-container__wrapper {
-    width: 100vw;
-    height: 100vh;
+.loading-container__wrapper {
+    @include full-screen-container;
     position: absolute;
     left: 0;
     top: 0;
-    display: grid;
-    grid-template-rows: 2fr 2fr 1fr;
-    justify-content: center;
-    align-items: center;
-    text-align: center;
+}
+
+.loading-container__header {
+    font-size: 3rem;
+    background: $blue-white-background;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
     font-family: Wellbutrin;
-    overflow: hidden;
+}
+
+.loading-container__dots::after {
+    content: '';
+    animation: dots 1.5s steps(4, end) infinite;
+}
+
+.expired-container__wrapper {
+    @include full-screen-container;
+    position: absolute;
+    left: 0;
+    top: 0;
+    grid-template-rows: auto auto auto;
+    gap: 2rem;
+}
+
+.expired-container__header {
+    font-size: 5rem;
+    background: $blue-white-background;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    font-family: Zig;
+}
+
+.expired-container__message {
+    font-size: 2rem;
+    color: #ffffff;
+    max-width: 80vw;
+}
+
+@mixin footer-action-button {
+    background: none;
+    border: none;
+    align-self: center;
+    justify-self: center;
+    cursor: pointer;
+    background: -webkit-linear-gradient(#FFEF73 20%, yellow 20% 40%, #FFFF89 40% 60%, #FFFFB6 60% 80%, white 80%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    font-family: Zig;
+    font-size: 3em;
+
+    @media (max-device-height: $breakpoint-small-width) {
+        font-size: 2em;
+    }
+
+    &:hover {
+        animation: none;
+
+        &::before {
+            content: ">";
+            margin-right: 1em;
+            font-family: Wellbutrin;
+        }
+
+        &::after {
+            content: "<";
+            margin-left: 1em;
+            font-family: Wellbutrin;
+        }
+    }
+}
+
+.expired-container__back-button {
+    @include footer-action-button;
+    margin-top: auto;
+    margin-bottom: 2rem;
+}
+
+@keyframes dots {
+    0%, 20% {
+        content: '';
+    }
+
+    40% {
+        content: '.';
+    }
+
+    60% {
+        content: '..';
+    }
+
+    80% {
+        content: '...';
+    }
+}
+
+.preparing-container__wrapper {
+    @include full-screen-container;
+    position: absolute;
+    left: 0;
+    top: 0;
+    grid-template-rows: 2fr 2fr 1fr;
 }
 
 .preparing-container__header {
@@ -323,10 +427,7 @@ body:before {
 }
 
 .starting-container__wrapper {
-    display: grid;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
+    @include full-screen-container;
 }
 
 .starting-container__message {
@@ -605,35 +706,6 @@ body:before {
 }
 
 .game-container__new-game {
-    background: none;
-    border: none;
-    align-self: center;
-    justify-self: center;
-    cursor: pointer;
-    background: -webkit-linear-gradient(#FFEF73 20%, yellow 20% 40%, #FFFF89 40% 60%, #FFFFB6 60% 80%, white 80%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    font-family: Zig;
+    @include footer-action-button;
     animation: blink ease-in 2s infinite;
-    font-size: 3em;
-
-    @media (max-device-height: $breakpoint-small-width) {
-        font-size: 2em;
-    }
-
-    &:hover {
-        animation: none;
-
-        &::before {
-            content: ">";
-            margin-right: 1em;
-            font-family: Wellbutrin;
-        }
-
-        &::after {
-            content: "<";
-            margin-left: 1em;
-            font-family: Wellbutrin;
-        }
-    }
 }

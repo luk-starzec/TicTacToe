@@ -1,17 +1,27 @@
 ﻿@page "/game/{GameUId}"
 @page "/game/{GameUId}/{PlayerUId}"
 @using Microsoft.AspNetCore.WebUtilities
-@inject NavigationManager NavigationManager
+@using TicTacToe.Logic
+@using TicTacToe.Models
+@using TicTacToe.Helpers
 
 <div class="game__wrapper">
 
-    @if (gameManager?.GameStage == EnumGameStage.Preparing)
+    @if (gameManager?.IsNotFound == true)
+    {
+        <ExpiredContainer OnBackHome='() => NavigationManager.NavigateTo("")' />
+    }
+    else if (gameManager?.GameStage == null)
+    {
+        <LoadingContainer />
+    }
+    else if (gameManager?.GameStage == EnumGameStage.Preparing)
     {
         <PreparingContainer Options="@gameManager?.GamePreparation" />
     }
     else if (gameManager?.GameStage == EnumGameStage.Starting)
     {
-        <StartingContainer OnCountdownEnd="StartGame" />
+        <StartingContainer OnCountdownEnd="StartMatch" />
     }
     else if (gameManager?.GameStage == EnumGameStage.Started)
     {
@@ -20,9 +30,14 @@
 
 </div>
 
-
-
 @code {
+    private NavigationManager NavigationManager;
+
+    public Game(NavigationManager navigationManager)
+    {
+        NavigationManager = navigationManager;
+    }
+
     [Parameter]
     public string GameUId { get; set; }
     [Parameter]
@@ -33,10 +48,12 @@
 
     protected override async Task OnInitializedAsync()
     {
+        GameUId = IdGenerator.Normalize(GameUId);
+        PlayerUId = IdGenerator.Normalize(PlayerUId);
+
         var hubUrl = NavigationManager.ToAbsoluteUri(GameHub.HubUrl).ToString();
-        var gameId = GuidEncoder.Decode(GameUId);
-        gameManager = new GameManager(hubUrl, gameId);
-        gameManager.PropertyChanged += (o, e) => StateHasChanged();
+        gameManager = new GameManager(hubUrl, GameUId);
+        gameManager.PropertyChanged += async (o, e) => await InvokeAsync(StateHasChanged);
 
         await gameManager.StartConnection();
     }
@@ -45,10 +62,10 @@
     {
         if (firstRender)
         {
-            Guid? playerId = PlayerUId is not null ? GuidEncoder.Decode(PlayerUId) : null;
-            gameManager.Player = playerId is not null ? new Player(playerId.Value) : null;
+            gameManager.Player = PlayerUId is not null ? new Player(PlayerUId) : null;
             await InitGame();
             await gameManager.JoinGame();
+            await gameManager.SynchronizeState();
         }
     }
 
@@ -63,10 +80,14 @@
             {
                 gameManager.Player.PlayerType = playerType.Value;
                 await gameManager.CreateGame();
+
+                // Clean up the URL to prevent accidental re-creation on refresh
+                var uri = NavigationManager.ToAbsoluteUri(NavigationManager.Uri).GetLeftPart(UriPartial.Path);
+                NavigationManager.NavigateTo(uri, replace: true);
             }
         }
     }
 
-    private async Task StartGame() => await gameManager.StartGame();
+    private async Task StartMatch() => await gameManager.StartMatch();
 
 }

@@ -9,7 +9,6 @@ Actions called on server:
  - JoinGame
  - StartGame
  - SynchronizeState
- - UpdateState
  - Play
  - PlayerTimeChange
 

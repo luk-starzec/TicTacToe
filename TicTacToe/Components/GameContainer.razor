@@ -1,5 +1,3 @@
-﻿@inject NavigationManager NavigationManager
-
 <div class="game-container__wrapper">
 
     <GameHeader Player="@player" Opponent="@opponent" FirstPlayer="@firstPlayer" />
@@ -23,6 +21,13 @@
 </div>
 
 @code {
+    private NavigationManager NavigationManager;
+
+    public GameContainer(NavigationManager navigationManager)
+    {
+        NavigationManager = navigationManager;
+    }
+
     [Parameter]
     public GameManager GameManager { get; set; }
 

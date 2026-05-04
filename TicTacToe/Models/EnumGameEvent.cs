@@ -1,12 +1,11 @@
-﻿namespace TicTacToe.Models
+﻿namespace TicTacToe.Models;
+
+public enum EnumGameEvent
 {
-    public enum EnumGameEvent
-    {
-        GameCreated,
-        PlayerJoined,
-        PlayersReady,
-        PlayerMoved,
-        PlayerTimeChanged,
-        GameOver,
-    }
+    GameCreated,
+    PlayerJoined,
+    PlayersReady,
+    PlayerMoved,
+    GameOver,
+    GameNotFound
 }

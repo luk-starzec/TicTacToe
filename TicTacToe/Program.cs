@@ -1,20 +1,33 @@
-using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using TicTacToe.Logic;
+using TicTacToe.Components;
 
-namespace TicTacToe
+var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.Configure<TicTacToe.Models.GameSettings>(builder.Configuration.GetSection("GameSettings"));
+builder.Services.AddMemoryCache();
+builder.Services.AddSingleton<IGameStateService, GameStateService>();
+
+builder.Services.AddRazorComponents()
+    .AddInteractiveServerComponents();
+
+var app = builder.Build();
+
+if (!app.Environment.IsDevelopment())
 {
-    public class Program
-    {
-        public static void Main(string[] args)
-        {
-            CreateHostBuilder(args).Build().Run();
-        }
-
-        public static IHostBuilder CreateHostBuilder(string[] args) =>
-            Host.CreateDefaultBuilder(args)
-                .ConfigureWebHostDefaults(webBuilder =>
-                {
-                    webBuilder.UseStartup<Startup>();
-                });
-    }
+    app.UseExceptionHandler("/Error", createScopeForErrors: true);
+    app.UseHsts();
 }
+
+app.UseHttpsRedirection();
+app.UseAntiforgery();
+
+app.MapStaticAssets();
+app.MapRazorComponents<TicTacToe.App>()
+    .AddInteractiveServerRenderMode();
+
+app.MapHub<GameHub>(GameHub.HubUrl);
+
+app.Run();

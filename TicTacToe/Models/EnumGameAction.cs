@@ -1,13 +1,11 @@
-﻿namespace TicTacToe.Models
+﻿namespace TicTacToe.Models;
+
+public enum EnumGameAction
 {
-    public enum EnumGameAction
-    {
-        CreateGame,
-        JoinGame,
-        StartGame,
-        SynchronizeState,
-        UpdateState,
-        Play,
-        PlayerTimeChange,
-    }
+    CreateGame,
+    JoinGame,
+    StartCountdown,
+    StartMatch,
+    SynchronizeState,
+    Play
 }

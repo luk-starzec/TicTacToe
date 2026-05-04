@@ -1,0 +1,20 @@
+<div class="expired-container__wrapper">
+
+    <header class="expired-container__header">
+        Session Expired
+    </header>
+
+    <p class="expired-container__message">
+        The game you are looking for does not exist or has already ended.
+    </p>
+
+    <button class="expired-container__back-button" @onclick="OnBackHome">
+        Back to Home
+    </button>
+
+</div>
+
+@code {
+    [Parameter]
+    public EventCallback OnBackHome { get; set; }
+}

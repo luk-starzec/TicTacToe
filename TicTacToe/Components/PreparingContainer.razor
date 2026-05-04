@@ -1,6 +1,3 @@
-﻿@inject NavigationManager NavigationManager
-@inject IJSRuntime JSRuntime
-
 <div class="preparing-container__wrapper">
 
     <div class=@cssCopiedInfo>
@@ -11,7 +8,7 @@
         Waiting for second player...
     </header>
 
-    @if (Options.OpponentId != Guid.Empty)
+    @if (!string.IsNullOrEmpty(Options.OpponentId))
     {
         <section class="preparing-container__section">
             <label class="preparing-container__label">
@@ -37,11 +34,20 @@
 </div>
 
 @code {
+    private NavigationManager NavigationManager;
+    private IJSRuntime JSRuntime;
+
+    public PreparingContainer(NavigationManager navigationManager, IJSRuntime jsRuntime)
+    {
+        NavigationManager = navigationManager;
+        JSRuntime = jsRuntime;
+    }
+
     [Parameter]
     public GamePreparation Options { get; set; }
 
-    private string LinkForSpectator => NavigationManager.ToAbsoluteUri(GameLogic.GetGameUrl(Options.GameId)).ToString();
-    private string LinkForOponent => NavigationManager.ToAbsoluteUri(GameLogic.GetGameUrl(Options.GameId, Options.OpponentId)).ToString();
+    private string LinkForSpectator => NavigationManager.ToAbsoluteUri(GameLogic.GetSpectatorUrl(Options.GameId)).ToString();
+    private string LinkForOponent => NavigationManager.ToAbsoluteUri(GameLogic.GetJoinUrl(Options.GameId, Options.OpponentId)).ToString();
 
     private bool visibleCopiedInfo;
     private string cssCopiedInfo => visibleCopiedInfo ? "preparing-container__copied preparing-container__copied--visible" : "preparing-container__copied";

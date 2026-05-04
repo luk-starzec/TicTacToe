@@ -1,5 +1,7 @@
-﻿@page "/"
-@inject NavigationManager NavigationManager
+@using TicTacToe.Models
+@using TicTacToe.Logic
+@using TicTacToe.Helpers
+@page "/"
 
 <div class="main__wrapper">
     <header class="main__header">
@@ -16,8 +18,17 @@
 </div>
 
 @code{
+    private NavigationManager NavigationManager;
+
+    public Index(NavigationManager navigationManager)
+    {
+        NavigationManager = navigationManager;
+    }
+
     private void StartGame(EnumPlayerType playerType)
     {
-        NavigationManager.NavigateTo(GameLogic.GetGameUrl(Guid.NewGuid(), Guid.NewGuid(), playerType));
+        var gameId = IdGenerator.Generate();
+        var playerId = IdGenerator.Generate();
+        NavigationManager.NavigateTo(GameLogic.GetStartUrl(gameId, playerId, playerType));
     }
 }

@@ -1,9 +1,8 @@
-﻿namespace TicTacToe.Models
+﻿namespace TicTacToe.Models;
+
+public enum EnumGameStage
 {
-    public enum EnumGameStage
-    {
-        Preparing,
-        Starting,
-        Started
-    }
+    Preparing,
+    Starting,
+    Started
 }
