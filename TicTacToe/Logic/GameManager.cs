@@ -9,6 +9,8 @@ namespace TicTacToe.Logic;
 
 public class GameManager : INotifyPropertyChanged
 {
+    public const string PersistenceKey = "GameState";
+
     private readonly HubConnection _gameConnection;
 
     public string GameId { get; private set; }
@@ -58,6 +60,18 @@ public class GameManager : INotifyPropertyChanged
     {
         Player?.IsActive = false;
         await _gameConnection.SendAsync(EnumGameAction.Play.ToString(), GameId, Player.PlayerId, field);
+    }
+
+    public void Initialize(GameState state, string playerUId)
+    {
+        if (state == null)
+            return;
+
+        Player = playerUId is not null ? new Player(playerUId) : null;
+
+        InitPlayers(state);
+        UpdateGameState(state);
+        UpdateUI();
     }
 
     private void GameCreated(string opponentId)

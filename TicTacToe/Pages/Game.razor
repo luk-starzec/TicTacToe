@@ -1,5 +1,6 @@
 ﻿@page "/game/{GameUId}"
 @page "/game/{GameUId}/{PlayerUId}"
+@implements IDisposable
 @using Microsoft.AspNetCore.WebUtilities
 @using TicTacToe.Logic
 @using TicTacToe.Models
@@ -7,35 +8,41 @@
 
 <div class="game__wrapper">
 
-    @if (gameManager?.IsNotFound == true)
+    @if (_gameManager?.IsNotFound == true)
     {
-        <ExpiredContainer OnBackHome='() => NavigationManager.NavigateTo("")' />
+        <ExpiredContainer OnBackHome='() => _navigationManager.NavigateTo("")' />
     }
-    else if (gameManager?.GameStage == null)
+    else if (_gameManager?.GameStage == null)
     {
         <LoadingContainer />
     }
-    else if (gameManager?.GameStage == EnumGameStage.Preparing)
+    else if (_gameManager?.GameStage == EnumGameStage.Preparing)
     {
-        <PreparingContainer Options="@gameManager?.GamePreparation" />
+        <PreparingContainer Options="@_gameManager?.GamePreparation" />
     }
-    else if (gameManager?.GameStage == EnumGameStage.Starting)
+    else if (_gameManager?.GameStage == EnumGameStage.Starting)
     {
         <StartingContainer OnCountdownEnd="StartMatch" />
     }
-    else if (gameManager?.GameStage == EnumGameStage.Started)
+    else if (_gameManager?.GameStage == EnumGameStage.Started)
     {
-        <GameContainer GameManager="@gameManager" />
+        <GameContainer GameManager="@_gameManager" />
     }
 
 </div>
 
 @code {
-    private NavigationManager NavigationManager;
+    private readonly NavigationManager _navigationManager;
+    private readonly PersistentComponentState _applicationState;
+    private readonly IGameStateService _gameStateService;
+    private PersistingComponentStateSubscription _subscription;
+    private GameManager _gameManager;
 
-    public Game(NavigationManager navigationManager)
+    public Game(NavigationManager navigationManager, PersistentComponentState applicationState, IGameStateService gameStateService)
     {
-        NavigationManager = navigationManager;
+        _navigationManager = navigationManager;
+        _applicationState = applicationState;
+        _gameStateService = gameStateService;
     }
 
     [Parameter]
@@ -43,51 +50,67 @@
     [Parameter]
     public string PlayerUId { get; set; }
 
-    private GameManager gameManager;
-
-
     protected override async Task OnInitializedAsync()
     {
         GameUId = IdGenerator.Normalize(GameUId);
         PlayerUId = IdGenerator.Normalize(PlayerUId);
 
-        var hubUrl = NavigationManager.ToAbsoluteUri(GameHub.HubUrl).ToString();
-        gameManager = new GameManager(hubUrl, GameUId);
-        gameManager.PropertyChanged += async (o, e) => await InvokeAsync(StateHasChanged);
+        _subscription = _applicationState.RegisterOnPersisting(PersistState);
 
-        await gameManager.StartConnection();
+        var hubUrl = _navigationManager.ToAbsoluteUri(GameHub.HubUrl).ToString();
+        _gameManager = new GameManager(hubUrl, GameUId);
+        _gameManager.PropertyChanged += async (o, e) => await InvokeAsync(StateHasChanged);
+
+        if (!_applicationState.TryTakeFromJson<GameState>(GameManager.PersistenceKey, out var state))
+            state = _gameStateService.GetState(GameUId);
+
+        if (state is not null)
+            _gameManager.Initialize(state, PlayerUId);
+
+        await _gameManager.StartConnection();
+    }
+
+    private Task PersistState()
+    {
+        if (_gameManager?.State is not null)
+            _applicationState.PersistAsJson(GameManager.PersistenceKey, _gameManager.State);
+
+        return Task.CompletedTask;
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (firstRender)
-        {
-            gameManager.Player = PlayerUId is not null ? new Player(PlayerUId) : null;
-            await InitGame();
-            await gameManager.JoinGame();
-            await gameManager.SynchronizeState();
-        }
+        if (!firstRender)
+            return;
+
+        await InitGame();
+        await _gameManager.JoinGame();
+        await _gameManager.SynchronizeState();
     }
 
     private async Task InitGame()
     {
-        var queryString = new Uri(NavigationManager.Uri).Query;
+        var queryString = new Uri(_navigationManager.Uri).Query;
+        var query = QueryHelpers.ParseQuery(queryString);
 
-        if (QueryHelpers.ParseQuery(queryString).TryGetValue("init", out var pt))
-        {
-            var playerType = Enum.Parse(typeof(EnumPlayerType), pt.ToString().ToUpper()) as EnumPlayerType?;
-            if (playerType.HasValue)
-            {
-                gameManager.Player.PlayerType = playerType.Value;
-                await gameManager.CreateGame();
+        if (!query.TryGetValue("init", out var pt))
+            return;
 
-                // Clean up the URL to prevent accidental re-creation on refresh
-                var uri = NavigationManager.ToAbsoluteUri(NavigationManager.Uri).GetLeftPart(UriPartial.Path);
-                NavigationManager.NavigateTo(uri, replace: true);
-            }
-        }
+        var playerType = Enum.Parse(typeof(EnumPlayerType), pt.ToString().ToUpper()) as EnumPlayerType?;
+        if (!playerType.HasValue)
+            return;
+
+        _gameManager.Player ??= new Player(PlayerUId);
+        _gameManager.Player.PlayerType = playerType.Value;
+
+        await _gameManager.CreateGame();
+
+        // Clean up the URL to prevent accidental re-creation on refresh
+        var uri = _navigationManager.ToAbsoluteUri(_navigationManager.Uri).GetLeftPart(UriPartial.Path);
+        _navigationManager.NavigateTo(uri, replace: true);
     }
 
-    private async Task StartMatch() => await gameManager.StartMatch();
+    private async Task StartMatch() => await _gameManager.StartMatch();
 
+    public void Dispose() => _subscription.Dispose();
 }
