@@ -15,8 +15,11 @@
                 Invite <span class="preparing-container__label--player">Player @Options.OpponentName</span>
             </label>
             <div class="preparing-container__link">
-                @LinkForOponent
-                <button type="button" class="preparing-container__copy-button" @onclick="()=>CopyTextToClipboard(LinkForOponent)">Copy</button>
+                <span class="preparing-container__link-text">@LinkForOponent</span>
+                <div class="preparing-container__buttons">
+                    <button type="button" class="preparing-container__copy-button" @onclick="()=>CopyTextToClipboard(LinkForOponent)">Copy</button>
+                    <button type="button" class="preparing-container__copy-button preparing-container__copy-button--qr" @onclick='()=>ShowQrCode(LinkForOponent, $"Join as Player {Options.OpponentName}")'>QR</button>
+                </div>
             </div>
         </section>
     }
@@ -26,10 +29,18 @@
             Invite spectators
         </label>
         <div class="preparing-container__link">
-            @LinkForSpectator
-            <button type="button" class="preparing-container__copy-button" @onclick="()=>CopyTextToClipboard(LinkForSpectator)">Copy</button>
+            <span class="preparing-container__link-text">@LinkForSpectator</span>
+            <div class="preparing-container__buttons">
+                <button type="button" class="preparing-container__copy-button" @onclick="()=>CopyTextToClipboard(LinkForSpectator)">Copy</button>
+                <button type="button" class="preparing-container__copy-button preparing-container__copy-button--qr" @onclick='()=>ShowQrCode(LinkForSpectator, "Join as Spectator")'>QR</button>
+            </div>
         </div>
     </section>
+
+    @if (showQrOverlay)
+    {
+        <QRCodeOverlay Url="@qrUrl" Title="@qrTitle" OnClose="HideQrCode" />
+    }
 
 </div>
 
@@ -52,11 +63,27 @@
     private bool visibleCopiedInfo;
     private string cssCopiedInfo => visibleCopiedInfo ? "preparing-container__copied preparing-container__copied--visible" : "preparing-container__copied";
 
+    private bool showQrOverlay;
+    private string qrUrl = string.Empty;
+    private string qrTitle = string.Empty;
+
     private async Task CopyTextToClipboard(string text)
     {
         var result = await JSRuntime.InvokeAsync<bool>("clipboardCopy.copyText", text);
         if (result)
             ShowCopiedInfo();
+    }
+
+    private void ShowQrCode(string url, string title)
+    {
+        qrUrl = url;
+        qrTitle = title;
+        showQrOverlay = true;
+    }
+
+    private void HideQrCode()
+    {
+        showQrOverlay = false;
     }
 
     private void ShowCopiedInfo()

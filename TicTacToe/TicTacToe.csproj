@@ -17,6 +17,7 @@
   <ItemGroup>
     <PackageReference Include="BuildWebCompiler" Version="1.12.405" />
     <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="10.0.0" />
+    <PackageReference Include="Net.Codecrete.QrCodeGenerator" Version="2.1.0" />
   </ItemGroup>
 
 </Project>

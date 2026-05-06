@@ -1,0 +1,34 @@
+@using Net.Codecrete.QrCodeGenerator
+
+<div class="qr-overlay">
+    <div class="qr-overlay__content">
+        <h2 class="qr-overlay__title">@Title</h2>
+        
+        <div class="qr-overlay__code-container">
+            @((MarkupString)GetQrSvg())
+        </div>
+
+        <button type="button" class="qr-overlay__close-button" @onclick="OnClose">
+            CLOSE
+        </button>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public string Url { get; set; } = string.Empty;
+
+    [Parameter]
+    public string Title { get; set; } = string.Empty;
+
+    [Parameter]
+    public EventCallback OnClose { get; set; }
+
+    private string GetQrSvg()
+    {
+        if (string.IsNullOrEmpty(Url)) return string.Empty;
+
+        var qr = QrCode.EncodeText(Url, QrCode.Ecc.Medium);
+        return qr.ToSvgString(4);
+    }
+}
