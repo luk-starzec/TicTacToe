@@ -597,7 +597,7 @@ body {
 .game-header__player-bar {
     position: relative;
     overflow: hidden;
-    width: calc(100%-1rem);
+    width: calc(100% - 1rem);
     height: 2.5em;
     background-color: red;
     border: solid 2px #ffffff;
@@ -681,7 +681,6 @@ body {
 
 .player-message__text {
     color: #FFFFCC;
-    animation: fade-in ease-in 3s infinite;
     font-size: 2.5em;
 
     @media (max-device-height: $breakpoint-mobile-width) {
@@ -690,6 +689,7 @@ body {
 
     &--active {
         color: yellow;
+        animation: blink ease-out 2s infinite;
     }
 
     &--game-over {

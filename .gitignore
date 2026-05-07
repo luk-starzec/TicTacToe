@@ -4,3 +4,8 @@ obj
 .vs
 publish
 *.user
+
+# Generated web assets
+TicTacToe/wwwroot/css/*.css
+TicTacToe/wwwroot/css/*.css.map
+!TicTacToe/wwwroot/css/normalize.css

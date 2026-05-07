@@ -13,7 +13,7 @@ This project is a high-performance, resilient web application demonstrating mode
     - **Constructor Injection** in Razor components.
     - **Optimized Asset Management** using the `@Assets` dictionary for fingerprinting and caching.
     - **Minimal API** hosting model.
-- **Visual Polish**: Responsive design using Sass, custom fonts, and interactive animations.
+- **Visual Polish**: Responsive design using **Dart Sass**, custom fonts, and interactive animations. Styles are compiled automatically during build using `AspNetCore.SassCompiler`.
 
 ---
 

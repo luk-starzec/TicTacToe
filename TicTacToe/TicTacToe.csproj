@@ -6,16 +6,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Content Remove="compilerconfig.json" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Include="compilerconfig.json" />
     <None Include="wwwroot\css\normalize.css" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="BuildWebCompiler" Version="1.12.405" />
+    <PackageReference Include="AspNetCore.SassCompiler" Version="1.99.0" />
     <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="10.0.0" />
     <PackageReference Include="Net.Codecrete.QrCodeGenerator" Version="2.1.0" />
   </ItemGroup>
