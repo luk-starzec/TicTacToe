@@ -1,4 +1,4 @@
-﻿@font-face {
+@font-face {
     font-family: Zig;
     src: url(../fonts/zig.ttf);
 }
@@ -23,8 +23,13 @@
     src: url(../fonts/PermanentMarker.ttf);
 }
 
-$blue-white-background: -webkit-linear-gradient(#52ADFF 20%, #63BDFF 20% 40%, #ADDEFF 40% 60%, #CEEFFF 60% 80%, #ffffff 80%);
-$blue-white-large-background: -webkit-linear-gradient(#008AF9 24%, #00A0F7 24% 32%, #52ADFF 32% 40%, #63BDFF 40% 48%, #7ED2FC 48% 56%,#ADDEFF 56% 64%,#CEEFFF 64% 72%, #E3F5FC 72% 80%, #ffffff 80%);
+$color-bg-dark: #222222;
+$color-bg-light: #ffffff;
+$color-text-main: #FFFFCC;
+$color-text-light: #EFEFFF;
+
+$blue-white-background: -webkit-linear-gradient(#52ADFF 20%, #63BDFF 20% 40%, #ADDEFF 40% 60%, #CEEFFF 60% 80%, $color-bg-light 80%);
+$blue-white-large-background: -webkit-linear-gradient(#008AF9 24%, #00A0F7 24% 32%, #52ADFF 32% 40%, #63BDFF 40% 48%, #7ED2FC 48% 56%,#ADDEFF 56% 64%,#CEEFFF 64% 72%, #E3F5FC 72% 80%, $color-bg-light 80%);
 $yellow-red-background: -webkit-linear-gradient(#FFFF9C 10%,#FFEF73 10% 18%,#FFDE52 18% 27%, #FFCE42 27% 36%, #FFAD31 36% 45%, #FF8C21 45% 54%, #FF7310 54% 63%, #EF6300 63% 72%, #DE5200 72% 80%, #DE4200 80% 90%, #DE0000 90%);
 $red-yellow-background: -webkit-linear-gradient(#C60000 0% 25%, #E50405 27% 34%, #FA2400 36% 43%, #FF6A00 45% 52%, #FF8C21 54% 61%, #FFAD31 63% 70%, #FFCE42 72% 78%, #FFDE52 80% 88%, #FFEF73 90%);
 
@@ -45,7 +50,7 @@ $breakpoint-medium-width: 800px;
 }
 
 body {
-    background: #ffffff;
+    background: $color-bg-dark;
     font-family: Wellbutrin;
 }
 
@@ -82,7 +87,7 @@ body {
     }
 
 .main__wrapper {
-    background-color: #222222;
+    background-color: $color-bg-dark;
     height: 100vh;
     width: 100vw;
     display: grid;
@@ -146,11 +151,11 @@ body {
 .main__option-button {
     border: none;
     background-color: transparent;
-    color: #ffffff;
+    color: $color-bg-light;
     cursor: pointer;
 
     &:hover {
-        background: -webkit-linear-gradient(#FFE875, #ffffff, #FFE875);
+        background: -webkit-linear-gradient(#FFE875, $color-bg-light, #FFE875);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
 
@@ -168,7 +173,7 @@ body {
 
 .main__footer {
     font-size: 1.3em;
-    color: #EFEFFF;
+    color: $color-text-light;
     text-align: center;
 }
 
@@ -188,12 +193,14 @@ body {
 .game__wrapper {
     width: 100vw;
     height: 100vh;
+    background-color: $color-bg-dark;
     background-image: url(../img/main-background.png);
     background-size: cover;
 }
 
 .loading-container__wrapper {
     @include full-screen-container;
+    background-color: $color-bg-dark;
     position: absolute;
     left: 0;
     top: 0;
@@ -231,7 +238,7 @@ body {
 
 .expired-container__message {
     font-size: 2rem;
-    color: #ffffff;
+    color: $color-bg-light;
     max-width: 80vw;
 }
 
@@ -503,7 +510,7 @@ body {
     visibility: collapse;
     display: flex;
     align-items: center;
-    background-color: #ffffff;
+    background-color: $color-bg-light;
     color: #333333;
     position: absolute;
     top: 0;
@@ -584,7 +591,7 @@ body {
 .game-header__player-label {
     grid-row: 2;
     font-size: 4em;
-    color: #FFFFCC;
+    color: $color-text-main;
     padding: 0 1rem;
     text-shadow: -3px -3px 0 #000, 3px -3px 0 #000, -3px 3px 0 #000, 3px 3px 0 #000;
 
@@ -600,7 +607,7 @@ body {
     width: calc(100% - 1rem);
     height: 2.5em;
     background-color: red;
-    border: solid 2px #ffffff;
+    border: solid 2px $color-bg-light;
 
     &--left {
         justify-self: end;
@@ -638,12 +645,12 @@ body {
     background-color: red;
     font-size: 2em;
     height: 1.25em;
-    color: #ffffff;
+    color: $color-bg-light;
     display: flex;
     justify-content: center;
     align-items: center;
     padding: 0 0.2em;
-    border: solid #ffffff;
+    border: solid $color-bg-light;
     border-width: 0 2px;
     text-shadow: -2px -2px 0 #000, 2px -2px 0 #000, -2px 2px 0 #000, 2px 2px 0 #000;
 }
@@ -680,7 +687,7 @@ body {
 }
 
 .player-message__text {
-    color: #FFFFCC;
+    color: $color-text-main;
     font-size: 2.5em;
 
     @media (max-device-height: $breakpoint-mobile-width) {

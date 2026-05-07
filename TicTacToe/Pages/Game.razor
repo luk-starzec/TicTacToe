@@ -1,6 +1,5 @@
-﻿@page "/game/{GameUId}"
+@page "/game/{GameUId}"
 @page "/game/{GameUId}/{PlayerUId}"
-@implements IDisposable
 @using Microsoft.AspNetCore.WebUtilities
 @using TicTacToe.Logic
 @using TicTacToe.Models
@@ -33,15 +32,12 @@
 
 @code {
     private readonly NavigationManager _navigationManager;
-    private readonly PersistentComponentState _applicationState;
     private readonly IGameStateService _gameStateService;
-    private PersistingComponentStateSubscription _subscription;
     private GameManager _gameManager;
 
-    public Game(NavigationManager navigationManager, PersistentComponentState applicationState, IGameStateService gameStateService)
+    public Game(NavigationManager navigationManager, IGameStateService gameStateService)
     {
         _navigationManager = navigationManager;
-        _applicationState = applicationState;
         _gameStateService = gameStateService;
     }
 
@@ -55,27 +51,16 @@
         GameUId = IdGenerator.Normalize(GameUId);
         PlayerUId = IdGenerator.Normalize(PlayerUId);
 
-        _subscription = _applicationState.RegisterOnPersisting(PersistState);
-
         var hubUrl = _navigationManager.ToAbsoluteUri(GameHub.HubUrl).ToString();
         _gameManager = new GameManager(hubUrl, GameUId);
         _gameManager.PropertyChanged += async (o, e) => await InvokeAsync(StateHasChanged);
 
-        if (!_applicationState.TryTakeFromJson<GameState>(GameManager.PersistenceKey, out var state))
-            state = _gameStateService.GetState(GameUId);
+        var state = _gameStateService.GetState(GameUId);
 
         if (state is not null)
             _gameManager.Initialize(state, PlayerUId);
 
         await _gameManager.StartConnection();
-    }
-
-    private Task PersistState()
-    {
-        if (_gameManager?.State is not null)
-            _applicationState.PersistAsJson(GameManager.PersistenceKey, _gameManager.State);
-
-        return Task.CompletedTask;
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -111,6 +96,4 @@
     }
 
     private async Task StartMatch() => await _gameManager.StartMatch();
-
-    public void Dispose() => _subscription.Dispose();
 }

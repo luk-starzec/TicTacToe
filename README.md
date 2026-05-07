@@ -8,7 +8,7 @@ This project is a high-performance, resilient web application demonstrating mode
 
 ### Key Features
 - **Real-time Multiplayer**: Powered by SignalR for sub-millisecond updates.
-- **State Resilience**: Uses `IMemoryCache` and `PersistentComponentState` to ensure games continue seamlessly after a page refresh (F5).
+- **State Resilience**: Uses `IMemoryCache` on the server to ensure games continue seamlessly after a page refresh (F5).
 - **Modern .NET 10 Architecture**:
     - **Constructor Injection** in Razor components.
     - **Optimized Asset Management** using the `@Assets` dictionary for fingerprinting and caching.

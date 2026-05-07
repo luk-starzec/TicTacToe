@@ -28,8 +28,8 @@
     private Player leftPlayer => Player?.PlayerType == FirstPlayer ? Player : Opponent;
     private Player rightPlayer => Player?.PlayerType == FirstPlayer ? Opponent : Player;
 
-    private decimal leftTime => leftPlayer?.TimePercentLeft ?? 1;
-    private decimal rightTime => rightPlayer?.TimePercentLeft ?? 1;
+    private decimal leftTime => leftPlayer?.TimePercentLeft ?? 0;
+    private decimal rightTime => rightPlayer?.TimePercentLeft ?? 0;
 
     private string styleLeft => getTimeStyle(leftTime);
     private string styleRight => getTimeStyle(rightTime);

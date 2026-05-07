@@ -9,8 +9,6 @@ namespace TicTacToe.Logic;
 
 public class GameManager : INotifyPropertyChanged
 {
-    public const string PersistenceKey = "GameState";
-
     private readonly HubConnection _gameConnection;
 
     public string GameId { get; private set; }
